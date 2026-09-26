@@ -12,12 +12,12 @@ export function SceneControls() {
     if (spotlightRef.current) {
       // Position the spotlight exactly at the camera position
       spotlightRef.current.position.copy(state.camera.position);
-      
+
       // Update target to be 10 units in front of the camera
       const targetPos = new THREE.Vector3(0, 0, -10);
       targetPos.applyQuaternion(state.camera.quaternion);
       targetPos.add(state.camera.position);
-      
+
       targetRef.current.position.copy(targetPos);
       spotlightRef.current.target = targetRef.current;
     }
@@ -25,7 +25,7 @@ export function SceneControls() {
 
   return (
     <>
-      <OrbitControls 
+      <OrbitControls
         makeDefault
         enableDamping
         dampingFactor={0.05}
@@ -56,7 +56,7 @@ export function FloatingDashboard() {
   useFrame((_state, delta) => {
     timeRef.current += delta;
     const t = timeRef.current;
-    
+
     if (groupRef.current) {
       // Manual floating animation to replace <Float />
       groupRef.current.position.y = Math.sin(t * 0.5) * 0.5;
@@ -70,7 +70,7 @@ export function FloatingDashboard() {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={3} color="#00ff66" />
       <pointLight position={[-10, -10, -10]} intensity={2} color="#bc13fe" />
-      
+
       <group ref={groupRef}>
         <Sphere ref={setSun} args={[1.5, 64, 64]} position={[0, 0, 0]}>
           <MeshDistortMaterial
@@ -99,47 +99,48 @@ export function FloatingDashboard() {
   );
 }
 
-export function TopicNode({ 
-  position, 
-  title, 
-  completed, 
+export function TopicNode({
+  position,
+  title,
+  completed,
   progress = completed ? 1 : 0,
-  onClick 
-}: { 
-  position: [number, number, number], 
-  title: string, 
-  completed: boolean, 
+  onClick
+}: {
+  position: [number, number, number],
+  title: string,
+  completed: boolean,
   progress?: number,
-  onClick: () => void 
+  onClick: () => void
 }) {
   const timeRef = useRef(0);
   const meshRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  const baseColor = completed ? "#00ff66" : "#bc13fe";
-  const hoverColor = completed ? "#66ff99" : "#d880ff";
-  const glowIntensity = completed ? (hovered ? 6 : 4) : (hovered ? 3 : 2);
+  const baseColor = "#2D6A4F";
+  const hoverColor = "#52B788";
+  const glowIntensity = hovered ? 2.5 : 1.5;
+  const textColor = "#000000";
 
   useFrame((_state, delta) => {
     timeRef.current += delta;
     const t = timeRef.current;
     const intensity = glowIntensity * (1 + Math.sin(t * 2) * 0.3);
-    
+
     if (meshRef.current) {
       // Gentle rotation
       meshRef.current.rotation.y += 0.01;
       meshRef.current.rotation.z += 0.005;
-      
+
       // Faster pulsing for completed nodes
       const pulseSpeed = completed ? 4 : 2;
       const pulse = Math.sin(t * pulseSpeed) * 0.1;
       const baseScale = 1 + pulse;
       const targetScale = hovered ? baseScale * 1.3 : baseScale;
-      
+
       // Smoothly interpolate scale
       meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-      
+
       // Update emissive intensity
       if (meshRef.current.material) {
         (meshRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = intensity;
@@ -152,7 +153,7 @@ export function TopicNode({
       // Pulse the ring scale slightly differently
       const ringPulse = 1 + Math.sin(t * 3) * 0.05;
       ringRef.current.scale.set(ringPulse, ringPulse, ringPulse);
-      
+
       // Update emissive intensity
       if (ringRef.current.material) {
         (ringRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = intensity * 2;
@@ -161,8 +162,8 @@ export function TopicNode({
   });
 
   return (
-    <group 
-      position={position} 
+    <group
+      position={position}
       onClick={onClick}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
@@ -170,9 +171,9 @@ export function TopicNode({
       {/* Progress Ring */}
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.85, 0.03, 16, 100, Math.PI * 2 * progress]} />
-        <meshStandardMaterial 
-          color={baseColor} 
-          emissive={baseColor} 
+        <meshStandardMaterial
+          color={baseColor}
+          emissive={baseColor}
           emissiveIntensity={glowIntensity * 1.5}
           transparent
           opacity={0.8}
@@ -181,9 +182,9 @@ export function TopicNode({
 
       {/* Background Ring (Ghost) */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.85, 0.01, 16, 100]} />
-        <meshStandardMaterial 
-          color={baseColor} 
+        <torusGeometry args={[0.65, 0.01, 16, 100]} />
+        <meshStandardMaterial
+          color={baseColor}
           transparent
           opacity={0.2}
           wireframe
@@ -191,20 +192,24 @@ export function TopicNode({
       </mesh>
 
       <mesh ref={meshRef}>
-        <octahedronGeometry args={[0.6, 0]} />
-        <meshStandardMaterial 
-          color={hovered ? hoverColor : baseColor} 
-          wireframe 
+        <octahedronGeometry args={[0.45, 0]} />
+        <meshStandardMaterial
+          color={hovered ? hoverColor : baseColor}
+          wireframe
           emissive={hovered ? hoverColor : baseColor}
           emissiveIntensity={glowIntensity}
         />
       </mesh>
       <Text
         position={[0, -1, 0]}
-        fontSize={0.25}
-        color="white"
+        fontSize={0.20}
+        color="#000000"
         anchorX="center"
         anchorY="middle"
+        textAlign="center"
+        maxWidth={2.2}
+        lineHeight={1.4}
+        overflowWrap="break-word"
         font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff"
       >
         {title.toUpperCase()}

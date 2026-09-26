@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import * as THREE from 'three';
 
-function Starfield() {
+/*function Starfield() {
   const points = useMemo(() => {
     const p = new Float32Array(5000 * 3);
     for (let i = 0; i < 5000; i++) {
@@ -25,30 +25,118 @@ function Starfield() {
     return p;
   }, []);
 
-  const timeRef = useRef(0);
-  const pointsRef = useRef<THREE.Points>(null);
+const timeRef = useRef(0);
+const pointsRef = useRef<THREE.Points>(null);
 
-  useFrame((_state, delta) => {
-    timeRef.current += delta;
-    const t = timeRef.current;
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y = t * 0.02;
-      pointsRef.current.rotation.x = t * 0.01;
-    }
-  });
+useFrame((_state, delta) => {
+  timeRef.current += delta;
+  const t = timeRef.current;
+  if (pointsRef.current) {
+    pointsRef.current.rotation.y = t * 0.02;
+    pointsRef.current.rotation.x = t * 0.01;
+  }
+});
 
+return (
+  <points ref={pointsRef}>
+    <bufferGeometry>
+      <bufferAttribute
+        attach="attributes-position"
+        count={5000}
+        array={points}
+        itemSize={3}
+      />
+    </bufferGeometry>
+    <pointsMaterial size={0.15} color="white" transparent opacity={0.8} sizeAttenuation={true} />
+  </points>
+);
+}*/
+
+function ThemeStyles() {
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={5000}
-          array={points}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.15} color="white" transparent opacity={0.8} sizeAttenuation={true} />
-    </points>
+    <style>{`
+      .aesthetic-theme {
+        background: #f5f5ef !important;
+        color: #263b32 !important;
+        font-family: Inter, system-ui, sans-serif;
+      }
+
+      .aesthetic-theme [class*="bg-black"],
+      .aesthetic-theme [class*="bg-slate-950"] {
+        background-color: #f5f5ef !important;
+      }
+
+      .aesthetic-theme [class*="bg-white/5"] {
+        background-color: #e9eee8 !important;
+      }
+
+      .aesthetic-theme [class*="bg-white/10"] {
+        background-color: #dfe7df !important;
+      }
+
+      .aesthetic-theme [class*="border-white/10"],
+      .aesthetic-theme [class*="border-white/20"] {
+        border-color: #d5ded5 !important;
+      }
+
+      .aesthetic-theme [class*="text-white/"] {
+        color: #718078 !important;
+      }
+
+      .aesthetic-theme [class~="text-white"] {
+        color: #263b32 !important;
+      }
+
+      .aesthetic-theme [class*="text-slate-"] {
+        color: #68786f !important;
+      }
+
+      .aesthetic-theme [class*="bg-neon-green"] {
+        background-color: #c9dfce !important;
+      }
+
+      .aesthetic-theme [class*="text-neon-green"] {
+        color: #477657 !important;
+      }
+
+      .aesthetic-theme [class*="border-neon-green"] {
+        border-color: #a9c9b1 !important;
+      }
+
+      .aesthetic-theme [class*="hover:bg-neon-green"]:hover {
+        background-color: #b9d5c0 !important;
+      }
+
+      .aesthetic-theme button {
+        border-radius: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .aesthetic-theme input,
+      .aesthetic-theme textarea {
+        background-color: #fbfcf8 !important;
+        color: #263b32 !important;
+        border-color: #d5ded5 !important;
+        border-radius: 10px !important;
+      }
+
+      .aesthetic-theme input::placeholder,
+      .aesthetic-theme textarea::placeholder {
+        color: #98a59b !important;
+      }
+
+      .aesthetic-theme h1,
+      .aesthetic-theme h2,
+      .aesthetic-theme h3,
+      .aesthetic-theme h4 {
+        color: #263b32;
+        letter-spacing: -0.04em;
+      }
+
+      .aesthetic-theme .prose {
+        color: #526359;
+      }
+    `}</style>
   );
 }
 
@@ -171,15 +259,15 @@ export default function App() {
             y = 20;
           }
           doc.text(line, margin, y);
-          y += fontSize * 0.4 + 2; 
+          y += fontSize * 0.4 + 2;
         }
-        y += 4; 
+        y += 4;
       };
 
       doc.setFillColor(15, 23, 42);
       doc.rect(0, 0, pageWidth, 30, 'F');
       y = 20;
-      addText('LUMINA INTELLIGENCE REPORT', 24, true, '#00ffcc');
+      addText('LEARNDEV INTELLIGENCE REPORT', 24, true, '#00ffcc');
       y = 40;
 
       addText(`Roadmap: ${selectedRoadmap.title}`, 16, true);
@@ -223,17 +311,17 @@ export default function App() {
         topicQuizzes.forEach((q: any, quizIdx: number) => {
           addText(`Quiz #${quizIdx + 1} (Score: ${q.score !== null ? q.score : 'N/A'}/${q.questions ? q.questions.length : '?'})`, 12, true);
           if (q.questions && Array.isArray(q.questions)) {
-             q.questions.forEach((question: any, qIdx: number) => {
-                addText(`Q${qIdx + 1}: ${question.question}`, 10, true);
-                addText(`Answer: ${question.correctAnswer}`, 10, false, '#22c55e');
-                y += 2;
-             });
+            q.questions.forEach((question: any, qIdx: number) => {
+              addText(`Q${qIdx + 1}: ${question.question}`, 10, true);
+              addText(`Answer: ${question.correctAnswer}`, 10, false, '#22c55e');
+              y += 2;
+            });
           }
           y += 5;
         });
       }
 
-      doc.save(`Lumina-Export-${selectedTopic.title.replace(/\s+/g, '_')}.pdf`);
+      doc.save(`LearnDev-AI-Export-${selectedTopic.title.replace(/\s+/g, '_')}.pdf`);
     } catch (e) {
       console.error("PDF generation failed", e);
       alert("Failed to export PDF format.");
@@ -321,7 +409,7 @@ export default function App() {
   const toggleTopicCompletion = async (roadmapId: string, topicId: string) => {
     const roadmap = roadmaps.find(r => r.id === roadmapId);
     if (!roadmap) return;
-    const updatedTopics = roadmap.topics.map((t: any) => 
+    const updatedTopics = roadmap.topics.map((t: any) =>
       t.id === topicId ? { ...t, completed: !t.completed } : t
     );
     await supabase.from('roadmaps').update({ topics: updatedTopics }).eq('id', roadmapId);
@@ -330,7 +418,7 @@ export default function App() {
 
   const handleUpdateDetailedDescription = async () => {
     if (!selectedRoadmap || !selectedTopic) return;
-    const updatedTopics = selectedRoadmap.topics.map((t: any) => 
+    const updatedTopics = selectedRoadmap.topics.map((t: any) =>
       t.id === selectedTopic.id ? { ...t, detailedDescription: detailedDescriptionInput } : t
     );
     await supabase.from('roadmaps').update({ topics: updatedTopics }).eq('id', selectedRoadmap.id);
@@ -468,15 +556,16 @@ export default function App() {
 
   if (!user && !selectedRoadmap) {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-black text-white p-4 overflow-hidden">
+      <div className="aesthetic-theme h-screen w-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+        <ThemeStyles />
         <div className="absolute inset-0 z-0 opacity-40">
           <Canvas>
-            <Starfield />
+            {/*<Starfield />*/}
             <FloatingDashboard />
             <OrbitControls enableZoom={false} />
           </Canvas>
         </div>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="z-10 text-center space-y-8 max-w-4xl"
@@ -485,7 +574,7 @@ export default function App() {
             Neural Learning Protocol v2.0
           </div>
           <h1 className="text-8xl md:text-9xl font-black tracking-tighter uppercase leading-[0.85] drop-shadow-[0_0_30px_rgba(0,255,102,0.3)]">
-            Lumina <br /> <span className="text-neon-green">Learn</span>
+            <span className="text-neon-green">LearnDev-AI</span>
           </h1>
           <p className="text-xl text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
             The next generation of AI-powered education. <br />
@@ -499,13 +588,13 @@ export default function App() {
               </div>
               {authError && <div className="p-3 bg-red-500/20 text-red-500 text-xs font-mono mb-4">{authError}</div>}
               <div>
-                <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="CODENAME (EMAIL)" className="w-full bg-white/5 border border-white/10 px-4 py-3 font-mono text-sm uppercase outline-none focus:border-neon-green transition-colors" />
+                <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="Enter your Email" className="w-full bg-white/5 border border-white/10 px-4 py-3 font-mono text-sm uppercase outline-none focus:border-neon-green transition-colors" />
               </div>
               <div>
-                <input type="password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} required placeholder="ACCESS KEY (PASSWORD)" className="w-full bg-white/5 border border-white/10 px-4 py-3 font-mono text-sm uppercase outline-none focus:border-neon-green transition-colors" />
+                <input type="password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} required placeholder="Enter your Password" className="w-full bg-white/5 border border-white/10 px-4 py-3 font-mono text-sm uppercase outline-none focus:border-neon-green transition-colors" />
               </div>
               <button disabled={authLoading} type="submit" className="w-full mt-4 bg-neon-green text-black font-black py-4 uppercase tracking-tighter hover:scale-[1.02] flex items-center justify-center gap-3 disabled:opacity-50">
-                {authLoading ? <Loader2 className="animate-spin w-5 h-5"/> : <LogIn className="w-5 h-5"/> }
+                {authLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <LogIn className="w-5 h-5" />}
                 {isSignUp ? 'Initialize Profile' : 'Access System'}
               </button>
             </form>
@@ -516,14 +605,15 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen w-screen flex bg-black text-white overflow-hidden font-display">
+    <div className="aesthetic-theme h-screen w-screen flex overflow-hidden font-display">
+      <ThemeStyles />
       {/* Sidebar */}
       <div className="w-80 border-r border-white/10 flex flex-col p-6 bg-black">
         <div className="flex items-center gap-3 mb-12">
           <div className="w-12 h-12 bg-neon-green rounded-none flex items-center justify-center rotate-45">
             <BookOpen className="w-6 h-6 text-black -rotate-45" />
           </div>
-          <h2 className="text-2xl font-black uppercase tracking-tighter">Lumina</h2>
+          <h2 className="text-2xl font-black uppercase tracking-tighter">LearnDev-AI</h2>
         </div>
 
         <div className="flex-1 space-y-8 overflow-y-auto">
@@ -559,11 +649,10 @@ export default function App() {
                     <button
                       key={level}
                       onClick={() => setDifficulty(level)}
-                      className={`flex-1 py-1 text-[8px] font-black uppercase tracking-tighter border transition-all ${
-                        difficulty === level 
-                          ? 'bg-neon-green border-neon-green text-black' 
-                          : 'border-white/10 text-white/30 hover:text-white'
-                      }`}
+                      className={`flex-1 py-1 text-[8px] font-black uppercase tracking-tighter border transition-all ${difficulty === level
+                        ? 'bg-neon-green border-neon-green text-black'
+                        : 'border-white/10 text-white/30 hover:text-white'
+                        }`}
                     >
                       {level}
                     </button>
@@ -626,7 +715,7 @@ export default function App() {
                     const completed = r.topics.filter((t: any) => t.completed).length;
                     const total = r.topics.length;
                     const percent = Math.round((completed / total) * 100);
-                    
+
                     return (
                       <motion.button
                         key={r.id}
@@ -653,7 +742,7 @@ export default function App() {
                           <span className="text-neon-green">{percent}%</span>
                         </div>
                         <div className="w-full h-1 bg-white/5 overflow-hidden">
-                          <motion.div 
+                          <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${percent}%` }}
                             className="h-full bg-neon-green shadow-[0_0_10px_rgba(0,255,102,0.5)]"
@@ -685,7 +774,7 @@ export default function App() {
               </motion.button>
 
               <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-                <Starfield />
+                {/*<Starfield />*/}
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} />
                 <directionalLight position={[-5, 5, 5]} intensity={1} color="#00ff66" />
@@ -693,8 +782,8 @@ export default function App() {
                   <TopicNode
                     key={topic.id}
                     position={[
-                      Math.sin(idx * 1.5) * 4,
-                      Math.cos(idx * 1.5) * 4,
+                      Math.cos((idx / Math.max(selectedRoadmap.topics.length, 1)) * Math.PI * 2) * 4,
+                      Math.sin((idx / Math.max(selectedRoadmap.topics.length, 1)) * Math.PI * 2) * 4,
                       0
                     ]}
                     title={topic.title}
@@ -719,7 +808,7 @@ export default function App() {
                 <div className="flex items-center gap-4">
                   <h2 className="text-4xl font-black uppercase tracking-tighter">{selectedRoadmap.title}</h2>
                   {user && user.id === selectedRoadmap.userId ? (
-                    <button 
+                    <button
                       onClick={handleShareRoadmap}
                       disabled={sharing}
                       className="p-2 bg-white/5 border border-white/10 hover:border-neon-green hover:text-neon-green transition-all"
@@ -728,7 +817,7 @@ export default function App() {
                       {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : copied ? <Check className="w-4 h-4 text-neon-green" /> : <Share2 className="w-4 h-4" />}
                     </button>
                   ) : user ? (
-                    <button 
+                    <button
                       onClick={handleCloneRoadmap}
                       disabled={generating}
                       className="px-4 py-2 bg-neon-green text-black font-black uppercase tracking-tighter text-[10px] hover:scale-105 transition-all"
@@ -736,7 +825,7 @@ export default function App() {
                       {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Clone to My Protocols'}
                     </button>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => window.location.reload()}
                       className="px-4 py-2 bg-white text-black font-black uppercase tracking-tighter text-[10px] hover:bg-neon-green transition-all"
                     >
@@ -746,8 +835,8 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-4 mt-6">
                   <div className="w-48 h-1 bg-white/10 overflow-hidden">
-                    <div 
-                      className="h-full bg-neon-green shadow-[0_0_10px_rgba(0,255,102,0.5)] transition-all duration-1000" 
+                    <div
+                      className="h-full bg-neon-green shadow-[0_0_10px_rgba(0,255,102,0.5)] transition-all duration-1000"
                       style={{ width: `${(selectedRoadmap.topics.filter((t: any) => t.completed).length / selectedRoadmap.topics.length) * 100}%` }}
                     />
                   </div>
@@ -774,7 +863,7 @@ export default function App() {
                         <div className="text-[10px] font-black text-neon-green uppercase tracking-[0.2em]">Topic Module</div>
                         <h3 className="text-4xl font-black uppercase tracking-tighter">{selectedTopic.title}</h3>
                       </div>
-                      <button 
+                      <button
                         onClick={() => toggleTopicCompletion(selectedRoadmap.id, selectedTopic.id)}
                         className={`p-4 transition-all border ${selectedTopic.completed ? 'bg-neon-green border-neon-green text-black' : 'bg-transparent border-white/10 text-white/30 hover:text-white'}`}
                       >
@@ -782,12 +871,12 @@ export default function App() {
                       </button>
                     </div>
                     <p className="text-slate-400 leading-relaxed font-medium">{selectedTopic.description}</p>
-                    
+
                     <div className="pt-6 border-t border-white/10 space-y-4">
                       <div className="flex items-center justify-between">
                         <h4 className="text-[10px] font-black text-neon-green uppercase tracking-[0.2em]">Detailed Intelligence</h4>
                         {!editingDetailedDescription && (
-                          <button 
+                          <button
                             onClick={() => {
                               setEditingDetailedDescription(true);
                               setDetailedDescriptionInput(selectedTopic.detailedDescription || '');
@@ -798,7 +887,7 @@ export default function App() {
                           </button>
                         )}
                       </div>
-                      
+
                       {editingDetailedDescription ? (
                         <div className="space-y-4">
                           <textarea
@@ -808,13 +897,13 @@ export default function App() {
                             className="w-full h-32 bg-white/5 border border-white/10 p-4 outline-none focus:border-neon-green font-mono text-xs text-slate-300 transition-colors"
                           />
                           <div className="flex gap-2">
-                            <button 
+                            <button
                               onClick={handleUpdateDetailedDescription}
                               className="flex-1 py-2 bg-neon-green text-black font-black uppercase tracking-tighter text-xs"
                             >
                               Save Logic
                             </button>
-                            <button 
+                            <button
                               onClick={() => setEditingDetailedDescription(false)}
                               className="flex-1 py-2 bg-white/5 border border-white/10 text-white font-black uppercase tracking-tighter text-xs"
                             >
@@ -831,7 +920,7 @@ export default function App() {
                           ) : (
                             <div className="flex flex-col items-center justify-center p-8 border border-dashed border-white/10 rounded-lg">
                               <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-4">No Detailed Data Found</p>
-                              <button 
+                              <button
                                 onClick={() => {
                                   setEditingDetailedDescription(true);
                                   setDetailedDescriptionInput('');
@@ -919,16 +1008,16 @@ export default function App() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                      <button 
-                        onClick={handleGenerateSummary} 
+                      <button
+                        onClick={handleGenerateSummary}
                         disabled={generatingSummary}
                         className="flex items-center justify-center gap-3 p-5 bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-black uppercase tracking-tighter text-sm disabled:opacity-50"
                       >
                         {generatingSummary ? <Loader2 className="animate-spin w-5 h-5" /> : <FileText className="w-5 h-5" />}
                         {generatingSummary ? 'Summarizing...' : 'Quick Review Summary'}
                       </button>
-                      <button 
-                        onClick={handleGenerateRevisionNotes} 
+                      <button
+                        onClick={handleGenerateRevisionNotes}
                         disabled={generatingNotes}
                         className="flex items-center justify-center gap-3 p-5 bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-black uppercase tracking-tighter text-sm disabled:opacity-50"
                       >
@@ -957,7 +1046,7 @@ export default function App() {
                             <div className="prose prose-invert prose-sm text-slate-300">
                               <ReactMarkdown>{youtubeVideo}</ReactMarkdown>
                             </div>
-                            <button 
+                            <button
                               onClick={() => setYoutubeVideo(null)}
                               className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white"
                             >
@@ -965,7 +1054,7 @@ export default function App() {
                             </button>
                           </div>
                         ) : (
-                          <button 
+                          <button
                             onClick={handleFindVideo}
                             disabled={findingVideo}
                             className="w-full flex items-center gap-4 p-5 bg-red-500/5 border border-red-500/20 hover:bg-red-500/10 text-red-500 transition-all disabled:opacity-50"
@@ -1008,7 +1097,7 @@ export default function App() {
                             </div>
                           ))}
                           {quizScore === null ? (
-                            <button 
+                            <button
                               onClick={submitQuiz}
                               className="w-full py-6 bg-neon-green text-black font-black text-xl uppercase tracking-tighter hover:scale-[1.02] active:scale-[0.98] transition-all"
                             >
@@ -1052,7 +1141,7 @@ export default function App() {
                               placeholder="Input query for AI processing..."
                               className="flex-1 bg-white/5 border border-white/10 px-6 py-5 outline-none focus:border-neon-green font-mono text-sm transition-colors"
                             />
-                            <button 
+                            <button
                               onClick={handleSolveDoubt}
                               className="px-8 bg-neon-green text-black font-black uppercase tracking-tighter transition-all hover:scale-105 active:scale-95"
                             >
