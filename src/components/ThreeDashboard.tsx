@@ -4,7 +4,7 @@ import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Constant horizontal spacing between consecutive topics matching user reference screenshot
-export const TOPIC_SPACING_X = 2.15;
+export const TOPIC_SPACING_X = 2.8;
 export const TOPIC_START_X = 0;
 
 // 1. Smoothly Scrolling Roadmap Container Group
@@ -366,10 +366,10 @@ export const TopicNode = React.memo(function TopicNode({
   const coreColor = completed
     ? "#2d8653" // Radiant deep mint/emerald for completed
     : isSelected
-    ? "#163824" // Signature forest green for selected
-    : hovered
-    ? "#275936"
-    : "#2d6a4f"; // Polished sage-jade for standard
+      ? "#163824" // Signature forest green for selected
+      : hovered
+        ? "#275936"
+        : "#2d6a4f"; // Polished sage-jade for standard
 
   const accentColor = completed ? "#52b788" : isSelected ? "#74c69d" : "#52b788";
   const glowMultiplier = completed ? 2.2 : isSelected ? 2.6 : hovered ? 2.0 : 1.4;
@@ -522,17 +522,17 @@ export const TopicNode = React.memo(function TopicNode({
             backgroundColor: isSelected
               ? '#163824'
               : completed
-              ? '#eef7f0'
-              : hovered
-              ? '#f4f8f4'
-              : 'rgba(255, 255, 255, 0.98)',
+                ? '#eef7f0'
+                : hovered
+                  ? '#f4f8f4'
+                  : 'rgba(255, 255, 255, 0.98)',
             borderColor: isSelected
               ? '#163824'
               : completed
-              ? '#9fd3ab'
-              : hovered
-              ? '#163824'
-              : '#d2ded2',
+                ? '#9fd3ab'
+                : hovered
+                  ? '#163824'
+                  : '#d2ded2',
             color: isSelected ? '#ffffff' : '#163824',
             boxShadow: isSelected
               ? '0 6px 20px rgba(22, 56, 36, 0.28), 0 0 0 2.5px #cbe3cf'
