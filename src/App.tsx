@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { supabase } from './lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { OrbitControls } from '@react-three/drei';
+import LoginBackground from './components/loginBackground';
 import {
   FloatingDashboard,
   TopicNode,
@@ -52,6 +54,47 @@ import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { jsPDF } from 'jspdf';
+
+function Starfield() {
+  const points = useMemo(() => {
+    const p = new Float32Array(5000 * 3);
+    for (let i = 0; i < 5000; i++) {
+      const r = 100;
+      const theta = 2 * Math.PI * Math.random();
+      const phi = Math.acos(2 * Math.random() - 1);
+      p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      p[i * 3 + 2] = r * Math.cos(phi);
+    }
+    return p;
+  }, []);
+
+  const timeRef = useRef(0);
+  const pointsRef = useRef<THREE.Points>(null);
+
+  useFrame((_state, delta) => {
+    timeRef.current += delta;
+    const t = timeRef.current;
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = t * 0.02;
+      pointsRef.current.rotation.x = t * 0.01;
+    }
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={5000}
+          array={points}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.15} color="white" transparent opacity={0.8} sizeAttenuation={true} />
+    </points>
+  );
+}
 
 function ThemeStyles() {
   return (
@@ -859,76 +902,86 @@ export default function App() {
   // Authentication View
   if (!user && !selectedRoadmap) {
     return (
-      <div className="aesthetic-theme h-screen w-screen flex flex-col items-center justify-center p-4 overflow-hidden relative">
-        <ThemeStyles />
-        <div className="absolute inset-0 z-0 opacity-40">
-          <Canvas>
-            <FloatingDashboard />
-            <OrbitControls enableZoom={false} />
-          </Canvas>
-        </div>
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#f5f5ef] text-[#163824] p-4 overflow-hidden relative">
+        <LoginBackground />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="z-10 text-center space-y-8 max-w-4xl"
         >
-          <div className="inline-block px-4 py-1.5 border border-[#a4cca9] rounded-full text-xs font-black uppercase tracking-[0.3em] text-[#275936] bg-[#e6f0e7] mb-2 shadow-sm">
+          <div className="inline-block px-4 py-1 border border-[#a9c9b1] rounded-full text-xs font-black uppercase tracking-[0.3em] text-[#275936] mb-4">
             Neural Learning Protocol v2.0
           </div>
-          <h1 className="text-8xl md:text-9xl font-black tracking-tighter uppercase leading-[0.85] text-[#163824]">
-            <span>LearnDev-AI</span>
+
+          <h1 className="text-8xl md:text-9xl font-black tracking-tighter uppercase leading-[0.85] drop-shadow-[0_0_30px_rgba(0,255,102,0.3)]">
+            <span className="text-[#163824]">LearnDev-AI</span>
           </h1>
-          <p className="text-lg text-[#4d6655] max-w-xl mx-auto font-medium leading-relaxed">
+
+          <p className="text-xl text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
             The next generation of AI-powered education. <br />
             Interactive 3D roadmaps, instant doubt solving, and personalized learning paths.
           </p>
-          <div className="pt-6 max-w-sm mx-auto w-full">
-            <form onSubmit={handleAuth} className="p-8 bg-white/80 backdrop-blur-xl border border-[#d2ded2] rounded-2xl shadow-xl space-y-4">
-              <div className="flex gap-2 mb-6 border-b border-[#d2ded2] pb-4">
+
+          <div className="pt-8 max-w-sm mx-auto w-full">
+            <form
+              onSubmit={handleAuth}
+              className="p-8 bg-white/80 backdrop-blur-xl border border-[#d2ded2] rounded-2xl shadow-xl space-y-4"
+            >
+              <div className="flex gap-2 mb-6 border-b border-white/10 pb-4">
                 <button
                   type="button"
                   onClick={() => setIsSignUp(false)}
-                  className={`flex-1 font-black uppercase text-xs tracking-widest py-2 rounded-lg transition-all ${!isSignUp ? 'bg-[#cbe3cf] text-[#163824]' : 'text-[#6b8572] hover:text-[#163824]'
+                  className={`flex-1 font-black uppercase text-xs tracking-widest ${!isSignUp ? 'text-[#163824]' : 'text-slate-500 hover:text-[#163824]'
                     }`}
                 >
                   Log In
                 </button>
+
                 <button
                   type="button"
                   onClick={() => setIsSignUp(true)}
-                  className={`flex-1 font-black uppercase text-xs tracking-widest py-2 rounded-lg transition-all ${isSignUp ? 'bg-[#cbe3cf] text-[#163824]' : 'text-[#6b8572] hover:text-[#163824]'
+                  className={`flex-1 font-black uppercase text-xs tracking-widest ${isSignUp ? 'text-[#163824]' : 'text-slate-500 hover:text-[#163824]'
                     }`}
                 >
                   Sign Up
                 </button>
               </div>
-              {authError && <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-mono rounded-lg">{authError}</div>}
-              <div>
-                <input
-                  type="email"
-                  value={authEmail}
-                  onChange={e => setAuthEmail(e.target.value)}
-                  required
-                  placeholder="Enter your Email"
-                  className="w-full bg-[#fbfcf8] border border-[#cfdccf] px-4 py-3 text-sm outline-none focus:border-[#2d6a4f] transition-colors"
-                />
-              </div>
-              <div>
-                <input
-                  type="password"
-                  value={authPassword}
-                  onChange={e => setAuthPassword(e.target.value)}
-                  required
-                  placeholder="Enter your Password"
-                  className="w-full bg-[#fbfcf8] border border-[#cfdccf] px-4 py-3 text-sm outline-none focus:border-[#2d6a4f] transition-colors"
-                />
-              </div>
+
+              {authError && (
+                <div className="p-3 bg-red-500/20 text-red-500 text-xs font-mono mb-4">
+                  {authError}
+                </div>
+              )}
+
+              <input
+                type="email"
+                value={authEmail}
+                onChange={e => setAuthEmail(e.target.value)}
+                required
+                placeholder="Enter your Email"
+                className="w-full bg-white border border-[#a9c9b1] rounded-lg px-4 py-3 font-mono text-sm text-[#163824] placeholder:text-slate-500 outline-none focus:border-[#275936] focus:ring-2 focus:ring-[#a9c9b1]/40 transition-colors"
+              />
+
+              <input
+                type="password"
+                value={authPassword}
+                onChange={e => setAuthPassword(e.target.value)}
+                required
+                placeholder="Enter your Password"
+                className="w-full bg-white border border-[#a9c9b1] rounded-lg px-4 py-3 font-mono text-sm text-[#163824] placeholder:text-slate-500 outline-none focus:border-[#275936] focus:ring-2 focus:ring-[#a9c9b1]/40 transition-colors"
+              />
+
               <button
                 disabled={authLoading}
                 type="submit"
-                className="w-full mt-4 bg-[#cbe3cf] hover:bg-[#b8d7bd] text-[#163824] font-black py-4 uppercase tracking-tight rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 shadow-sm"
+                className="w-full mt-4 bg-[#cbe3cf] text-[#163824] font-black py-4 uppercase tracking-tighter hover:scale-[1.02] flex items-center justify-center gap-3 disabled:opacity-50"
               >
-                {authLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+                {authLoading ? (
+                  <Loader2 className="animate-spin w-5 h-5" />
+                ) : (
+                  <LogIn className="w-5 h-5" />
+                )}
                 {isSignUp ? 'Initialize Profile' : 'Access System'}
               </button>
             </form>
@@ -937,7 +990,6 @@ export default function App() {
       </div>
     );
   }
-
   return (
     <div className="aesthetic-theme h-screen w-screen flex overflow-hidden font-display">
       <ThemeStyles />
@@ -1063,8 +1115,8 @@ export default function App() {
                     <div
                       key={r.id}
                       className={`group/protocol relative flex items-center justify-between rounded-xl transition-all border ${selectedRoadmap?.id === r.id
-                          ? 'bg-[#cbe3cf] border-[#a9c9b1] text-[#163824] shadow-sm'
-                          : 'border-transparent hover:bg-[#e8efe8] text-[#3d5947]'
+                        ? 'bg-[#cbe3cf] border-[#a9c9b1] text-[#163824] shadow-sm'
+                        : 'border-transparent hover:bg-[#e8efe8] text-[#3d5947]'
                         }`}
                     >
                       <button
@@ -1124,8 +1176,8 @@ export default function App() {
                       key={level}
                       onClick={() => setDifficulty(level)}
                       className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-tight rounded-lg border transition-all ${difficulty === level
-                          ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
-                          : 'border-[#cfdccf] bg-white text-[#5c7564] hover:bg-[#f0f4ef]'
+                        ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
+                        : 'border-[#cfdccf] bg-white text-[#5c7564] hover:bg-[#f0f4ef]'
                         }`}
                     >
                       {level}
@@ -1305,9 +1357,8 @@ export default function App() {
               }}
               onPointerUp={() => { isShiftDraggingRef.current = false; }}
               onPointerCancel={() => { isShiftDraggingRef.current = false; }}
-              className={`w-full relative bg-[#f5f5ef] transition-all duration-300 select-none overflow-hidden ${
-                isTopicDetailsOpen || isChatOpen ? 'h-[48%]' : 'h-full'
-              }`}
+              className={`w-full relative bg-[#f5f5ef] transition-all duration-300 select-none overflow-hidden ${isTopicDetailsOpen || isChatOpen ? 'h-[48%]' : 'h-full'
+                }`}
             >
               {/* Return to Dashboard Button */}
               <motion.button
@@ -1563,8 +1614,8 @@ export default function App() {
                             onClick={() => toggleTopicCompletion(selectedRoadmap.id, selectedTopic.id)}
                             title={selectedTopic.completed ? "Mark Topic Incomplete" : "Mark Topic Completed"}
                             className={`p-2.5 rounded-xl border transition-all ${selectedTopic.completed
-                                ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
-                                : 'bg-white border-[#cfdccf] text-[#5c7564] hover:border-[#163824]'
+                              ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
+                              : 'bg-white border-[#cfdccf] text-[#5c7564] hover:border-[#163824]'
                               }`}
                           >
                             <CheckCircle className="w-5 h-5" />
@@ -1869,8 +1920,8 @@ export default function App() {
                             onClick={() => setIsChatHistoryOpen(!isChatHistoryOpen)}
                             title="View Chat History"
                             className={`px-3 py-1.5 border text-[10px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${isChatHistoryOpen
-                                ? 'bg-[#163824] border-[#163824] text-white'
-                                : 'bg-white border-[#cfdccf] text-[#163824] hover:bg-[#e8efe8]'
+                              ? 'bg-[#163824] border-[#163824] text-white'
+                              : 'bg-white border-[#cfdccf] text-[#163824] hover:bg-[#e8efe8]'
                               }`}
                           >
                             <History className="w-3.5 h-3.5" />
@@ -1916,8 +1967,8 @@ export default function App() {
                                 <div
                                   key={conv.id}
                                   className={`p-4 rounded-xl border transition-all flex items-center justify-between group ${activeConversationId === conv.id
-                                      ? 'bg-[#cbe3cf] border-[#a9c9b1] text-[#163824] shadow-sm'
-                                      : 'bg-white border-[#cfdccf] hover:border-[#163824] text-[#163824]'
+                                    ? 'bg-[#cbe3cf] border-[#a9c9b1] text-[#163824] shadow-sm'
+                                    : 'bg-white border-[#cfdccf] hover:border-[#163824] text-[#163824]'
                                     }`}
                                 >
                                   <div
@@ -1970,8 +2021,8 @@ export default function App() {
                                       key={opt}
                                       onClick={() => setQuizAnswers({ ...quizAnswers, [i]: opt })}
                                       className={`p-4 text-left rounded-xl transition-all border font-bold text-xs uppercase tracking-tight ${quizAnswers[i] === opt
-                                          ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
-                                          : 'bg-[#fbfcf8] border-[#cfdccf] hover:border-[#163824] text-[#163824]'
+                                        ? 'bg-[#163824] border-[#163824] text-white shadow-sm'
+                                        : 'bg-[#fbfcf8] border-[#cfdccf] hover:border-[#163824] text-[#163824]'
                                         }`}
                                     >
                                       {opt}
@@ -2010,8 +2061,8 @@ export default function App() {
                             {chatMessages.map((msg, i) => (
                               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[82%] p-4 rounded-2xl ${msg.role === 'user'
-                                    ? 'bg-[#cbe3cf] text-[#163824] font-semibold shadow-sm'
-                                    : 'bg-white border border-[#cfdccf] text-[#385240] shadow-sm'
+                                  ? 'bg-[#cbe3cf] text-[#163824] font-semibold shadow-sm'
+                                  : 'bg-white border border-[#cfdccf] text-[#385240] shadow-sm'
                                   }`}>
                                   <div className="prose prose-sm">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
